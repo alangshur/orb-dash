@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Image, Text, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import AwesomeButton from "react-native-really-awesome-button";
 
 class End extends Component {
     constructor(props) {
@@ -16,20 +17,48 @@ class End extends Component {
     render = () => {
         return (
             <View style={styles.container}>
-                <Text style={styles.gameOverText}>Game Over</Text>
-                <Text style={styles.scoreText}>Score: {this.state.score}</Text>
-
-                <Button 
-                    title='Play Again'
-                    style={styles.playAgainButton}
-                    onPress={this._handlePlayAgainButtonPress}
+                <Image
+                    source={require('./assets/game-over.png')}
+                    style={styles.gameOverLogo}
                 />
 
-                <Button 
-                    title='Home'
-                    style={styles.homeButton}
-                    onPress={this._handleHomeButtonPress}
-                />
+                <View marginBottom={20}>
+                    <AwesomeButton
+                        width={160}
+                        height={45}
+                        raiseLevel={0}
+                        backgroundColor='#616161'
+                        disabled={true}
+                    >
+                        <Text style={styles.scoreText}>
+                            Score: {this.state.score}
+                        </Text>
+                    </AwesomeButton>
+                </View>
+
+                <View marginBottom={20}>
+                    <AwesomeButton
+                        width={160}
+                        height={45}
+                        raiseLevel={3}
+                        backgroundColor='#d00013'
+                        onPress={this._handlePlayAgainButtonPress}
+                    >
+                        Play Again  
+                    </AwesomeButton>
+                </View>
+
+                <View>
+                    <AwesomeButton
+                        width={160}
+                        height={45}
+                        raiseLevel={3}
+                        backgroundColor='#d00013'
+                        onPress={this._handleHomeButtonPress}
+                    >
+                        Home  
+                    </AwesomeButton>
+                </View>
             </View>
         );
     }
@@ -66,19 +95,19 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: '#c4c4c4'
     },
-    gameOverText: {
-        fontSize: 30
+    gameOverLogo: {
+        position: 'absolute',
+        resizeMode: 'contain',
+        top: '12%',
+        height: '25%'
     },
     scoreText: {
-        fontSize: 12
-    },
-    playAgainButton: {
-        fontSize: 15
-    },
-    homeButton: {
-        fontSize: 15
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 13
     }
 });
 
