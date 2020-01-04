@@ -5,7 +5,6 @@ import Home from './home';
 import Game from './game';
 import End from './end';
 
-// build app navigator
 const StackNavigator = createStackNavigator(
     {
         Home: Home,
@@ -18,6 +17,5 @@ const StackNavigator = createStackNavigator(
     }
 );
 
-// containerize navigator
 const App = createAppContainer(StackNavigator)
 export default App;

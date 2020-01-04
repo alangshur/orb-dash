@@ -1,11 +1,30 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 
 class Home extends Component {
+    constructor(props) {
+        
+    }
+
+    componentDidMount = () => {
+        // FETCH HIGH SCORE FROM STORAGE AND UPDATE STATE
+    };
+
+    handlePlayButtonPress = () => {
+        this.props.navigation.navigate('Game');
+    };  
+
     render = () => {
         return (
             <View style={styles.container}>
-                <Text style={styles.fontSize}>Home</Text>
+                <Text style={styles.titleText}>Swipe Game</Text>
+                <Text style={styles.highscoreText}>High Score: 100</Text>
+
+                <Button 
+                    title='Play'
+                    style={styles.playButton}
+                    onPress={this.handlePlayButtonPress}
+                />
             </View>
         );
     }
@@ -17,8 +36,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    text: {
-        fontSize: 20
+    titleText: {
+        fontSize: 30
+    },
+    highscoreText: {
+        fontSize: 12
+    },
+    playButton: {
+        fontSize: 15
     }
 });
 

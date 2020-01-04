@@ -1,11 +1,20 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 
 class Game extends Component {
+    handleGameOver = () => {    
+        this.props.navigation.navigate('End');
+    };
+
     render = () => {
         return (
             <View style={styles.container}>
                 <Text style={styles.fontSize}>Game</Text>
+
+                <Button 
+                    title='Game Over'
+                    onPress={this.handleGameOver}
+                />
             </View>
         );
     }
