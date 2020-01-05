@@ -24,8 +24,8 @@ class End extends Component {
 
                 <View marginBottom={20}>
                     <AwesomeButton
-                        width={160}
-                        height={45}
+                        width={200}
+                        height={60}
                         raiseLevel={0}
                         backgroundColor='#616161'
                         disabled={true}
@@ -38,8 +38,9 @@ class End extends Component {
 
                 <View marginBottom={20}>
                     <AwesomeButton
-                        width={160}
-                        height={45}
+                        width={200}
+                        height={60}
+                        textSize={18}
                         raiseLevel={3}
                         backgroundColor='#b20211'
                         onPress={this._handlePlayAgainButtonPress}
@@ -50,8 +51,9 @@ class End extends Component {
 
                 <View>
                     <AwesomeButton
-                        width={160}
-                        height={45}
+                        width={200}
+                        height={60}
+                        textSize={18}
                         raiseLevel={3}
                         backgroundColor='#b20211'
                         onPress={this._handleHomeButtonPress}
@@ -103,13 +105,13 @@ const styles = StyleSheet.create({
     gameOverLogo: {
         position: 'absolute',
         resizeMode: 'contain',
-        top: '14%',
-        height: '27%'
+        top: '7%',
+        height: '32%'
     },
     scoreText: {
         color: '#ffffff',
         fontWeight: 'bold',
-        fontSize: 13
+        fontSize: 18
     }
 });
 

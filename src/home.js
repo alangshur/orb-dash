@@ -23,8 +23,8 @@ class Home extends Component {
 
                 <View marginBottom={20}>
                     <AwesomeButton
-                        width={160}
-                        height={45}
+                        width={200}
+                        height={60}
                         raiseLevel={0}
                         backgroundColor='#616161'
                         disabled={true}
@@ -37,9 +37,9 @@ class Home extends Component {
 
                 <View>
                     <AwesomeButton
-                        width={160}
-                        height={45}
-                        textSize={13}
+                        width={200}
+                        height={60}
+                        textSize={18}
                         raiseLevel={3}
                         backgroundColor='#b20211'
                         onPress={this._handlePlayButtonPress}
@@ -82,12 +82,12 @@ const styles = StyleSheet.create({
     titleLogo: {
         position: 'absolute',
         resizeMode: 'contain',
-        top: '16%',
-        height: '17%'
+        top: '14%',
+        height: '19%'
     },
     highscoreText: {
         fontWeight: 'bold',
-        fontSize: 13,
+        fontSize: 18,
         color: '#ffffff',
     }
 });
