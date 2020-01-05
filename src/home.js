@@ -41,7 +41,7 @@ class Home extends Component {
                         height={45}
                         textSize={13}
                         raiseLevel={3}
-                        backgroundColor='#d00013'
+                        backgroundColor='#b20211'
                         onPress={this._handlePlayButtonPress}
                     >
                         Play    
@@ -75,18 +75,18 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#c4c4c4'
+        backgroundColor: '#dbdbdb'
     },
     titleLogo: {
         position: 'absolute',
         resizeMode: 'contain',
-        top: '17%',
-        height: '15%'
+        top: '16%',
+        height: '17%'
     },
     highscoreText: {
-        color: 'white',
         fontWeight: 'bold',
-        fontSize: 13
+        fontSize: 13,
+        color: '#ffffff',
     }
 });
 

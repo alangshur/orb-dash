@@ -41,7 +41,7 @@ class End extends Component {
                         width={160}
                         height={45}
                         raiseLevel={3}
-                        backgroundColor='#d00013'
+                        backgroundColor='#b20211'
                         onPress={this._handlePlayAgainButtonPress}
                     >
                         Play Again  
@@ -53,7 +53,7 @@ class End extends Component {
                         width={160}
                         height={45}
                         raiseLevel={3}
-                        backgroundColor='#d00013'
+                        backgroundColor='#b20211'
                         onPress={this._handleHomeButtonPress}
                     >
                         Home  
@@ -96,16 +96,16 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#c4c4c4'
+        backgroundColor: '#dbdbdb'
     },
     gameOverLogo: {
         position: 'absolute',
         resizeMode: 'contain',
-        top: '11%',
+        top: '10%',
         height: '25%'
     },
     scoreText: {
-        color: 'white',
+        color: '#ffffff',
         fontWeight: 'bold',
         fontSize: 13
     }
