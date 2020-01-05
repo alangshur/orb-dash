@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     gameOverLogo: {
         position: 'absolute',
         resizeMode: 'contain',
-        top: '12%',
+        top: '11%',
         height: '25%'
     },
     scoreText: {

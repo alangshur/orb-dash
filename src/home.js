@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         resizeMode: 'contain',
         top: '17%',
-        height: '16%'
+        height: '15%'
     },
     highscoreText: {
         color: 'white',
