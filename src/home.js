@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import { View, StatusBar, Image, Text, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import AwesomeButton from "react-native-really-awesome-button";
 
@@ -53,7 +53,7 @@ class Home extends Component {
 
     _runHomePage = () => {
         console.log('Home page.');
-
+        StatusBar.setHidden(true);
         this._getHighscore((error, result) => {
             if (error) console.log(error);
             else if (result !== null) 

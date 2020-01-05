@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import { View, StatusBar, Image, Text, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import AwesomeButton from "react-native-really-awesome-button";
 
@@ -65,7 +65,7 @@ class End extends Component {
 
     _runEndPage = () => {
         console.log('End page.');
-
+        StatusBar.setHidden(true);
         this._getHighscore((error, result) => {
             if (error) console.log(error);
             else if (result !== null && this.state.score > result)
@@ -101,8 +101,8 @@ const styles = StyleSheet.create({
     gameOverLogo: {
         position: 'absolute',
         resizeMode: 'contain',
-        top: '10%',
-        height: '25%'
+        top: '14%',
+        height: '27%'
     },
     scoreText: {
         color: '#ffffff',

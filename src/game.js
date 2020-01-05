@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, StatusBar, Text, Button, StyleSheet } from 'react-native';
 
 class Game extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            score: 0
+            score: 69
         }
     }
     
@@ -16,7 +16,7 @@ class Game extends Component {
     render = () => {
         return (
             <View style={styles.container}>
-                <Text style={styles.fontSize}>Game</Text>
+                <Text style={styles.scoreText}>{this.state.score}</Text>
 
                 <Button 
                     title='Game Over'
@@ -25,17 +25,13 @@ class Game extends Component {
             </View>
         );
     }
-    
+
     _runGamePage = () => {
         console.log('Game page.');
+        StatusBar.setHidden(true);
     }
 
-    _startNewGame = () => {
-        console.log('New game!');
-    };
-
     _handleGameOver = () => {    
-        console.log('Game over!');
         this.props.navigation.replace('End', {
             score: this.state.score
         });
@@ -47,10 +43,21 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#dbdbdb'
+        backgroundColor: '#dbdbdb',
+        borderLeftWidth: 20,
+        borderLeftColor: '#9e0000',
+        borderTopWidth: 20,
+        borderTopColor: '#009e00',
+        borderRightWidth: 20,
+        borderRightColor: '#00009e',
+        borderBottomWidth: 20,
+        borderBottomColor: '#dbd100'
     },
-    text: {
-        fontSize: 20
+    scoreText: {
+        position: 'absolute',
+        top: '8%',
+        fontWeight: 'bold',
+        fontSize: 60
     }
 });
 
