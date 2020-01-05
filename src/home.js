@@ -54,6 +54,8 @@ class Home extends Component {
     _runHomePage = () => {
         console.log('Home page.');
         StatusBar.setHidden(true);
+
+        // fetch and post highscore
         this._getHighscore((error, result) => {
             if (error) console.log(error);
             else if (result !== null) 

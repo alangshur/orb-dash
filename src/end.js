@@ -66,6 +66,8 @@ class End extends Component {
     _runEndPage = () => {
         console.log('End page.');
         StatusBar.setHidden(true);
+
+        // fetch and update highscore
         this._getHighscore((error, result) => {
             if (error) console.log(error);
             else if (result !== null && this.state.score > result)
