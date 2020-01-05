@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { Animated, View, StatusBar, Text, StyleSheet } from 'react-native';
+import { Animated, Dimensions, View, StatusBar, Text, StyleSheet, Easing } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
+
+const SCREEN_DIMENSIONS = Dimensions.get('window');
 
 class Game extends Component {
     constructor(props) {
@@ -8,12 +10,13 @@ class Game extends Component {
         this.state = {
             score: 69,
             gameRunning: true,
-            slidingTimerY: new Animated.Value(-100),
+            slidingTimerY: new Animated.Value(0),
         }
     }
     
     componentDidMount = () => {
         this._runGamePage();
+        this._restartTimer(5000);
     }
 
     render = () => {
@@ -32,19 +35,14 @@ class Game extends Component {
                     backgroundColor: this.state.backgroundColor
                 }}
             >
+
                 <View style={styles.container}>
                     <Text style={styles.scoreText}>{this.state.score}</Text>
-                    <Animated.View 
-                        style={[
-                            styles.slidingTimer, 
-                            {
-                                transform: [{
-                                    translateY: this.state.slidingTimerY
-                                }]
-                            }
-                        ]}
-                    />
 
+                    <Animated.View 
+                        style={styles.slidingTimer}
+                        height={this.state.slidingTimerY}
+                    />
                 </View>
             </GestureRecognizer>
         );
@@ -87,6 +85,16 @@ class Game extends Component {
             score: this.state.score
         });
     }
+
+    _restartTimer(time) {
+        this.setState({ slidingTimerY: new Animated.Value(0) }, () => {
+            Animated.timing(this.state.slidingTimerY, {
+                toValue: SCREEN_DIMENSIONS.height - 40,
+                duration: time,
+                easing: Easing.linear
+            }).start();
+        });
+    }
 }
 
 const styles = StyleSheet.create({
@@ -113,10 +121,9 @@ const styles = StyleSheet.create({
     slidingTimer: {
         position: 'absolute',
         zIndex: -1,
-        height: '100%',
         width: '100%',
-        top: '100%',
-        backgroundColor: '#a8a8a8',
+        bottom: 0,
+        backgroundColor: '#bdbdbd'
     }
 });
 
