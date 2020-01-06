@@ -42,7 +42,7 @@ class Home extends Component {
                         width={200}
                         height={60}
                         textSize={18}
-                        raiseLevel={3}
+                        raiseLevel={4}
                         backgroundColor='#b20211'
                         onPress={this._handlePlayButtonPress}
                     >

@@ -43,7 +43,7 @@ class End extends Component {
                         width={200}
                         height={60}
                         textSize={18}
-                        raiseLevel={3}
+                        raiseLevel={4}
                         backgroundColor='#b20211'
                         onPress={this._handlePlayAgainButtonPress}
                     >
@@ -56,7 +56,7 @@ class End extends Component {
                         width={200}
                         height={60}
                         textSize={18}
-                        raiseLevel={3}
+                        raiseLevel={4}
                         backgroundColor='#b20211'
                         onPress={this._handleHomeButtonPress}
                     >
@@ -74,7 +74,7 @@ class End extends Component {
         // fetch and update highscore
         this._getHighscore((error, result) => {
             if (error) console.log(error);
-            else if (result !== null || this.state.score > result)
+            else if (result == null || this.state.score > result)
                 this._setHighscore(String(this.state.score));
         });
     };
