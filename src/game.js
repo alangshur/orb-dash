@@ -28,8 +28,8 @@ const COLOR_STEPS = 15.0;
 const FLASH_TIME_MS = 75;
 const FADE_IN_ORB_TIME_MS = 600;
 const SLIDE_ORB_TIME_MS = 250;
-const LAST_SWIPE_W_BUFFER = 250 + 200;
-const TIME_EXPIRED_W_BUFFER = 50;
+const LAST_SWIPE_W_BUFFER = SLIDE_ORB_TIME_MS + 150;
+const TIME_EXPIRED_W_BUFFER = 75;
 
 // type constants
 const DIRECTION_MAP_ARR = new Array('up', 'right', 'down', 'left');
@@ -142,7 +142,12 @@ class Game extends Component {
                     }}
                 >
                     <View style={styles.container}>
-                        <Text style={styles.scoreText}>{this.state.score}</Text>
+                        <Text 
+                            style={styles.scoreText}
+                            color={'#ffffff'}
+                        >
+                            {this.state.score}
+                        </Text>
                         
                         <Animated.View 
                             style={{ ...styles.orbView, opacity: this.state.orbOpacity }}
@@ -328,8 +333,8 @@ class Game extends Component {
             gameStepActive: false,
             score: this.state.score + 1,
             gameStep: this._generateNextStep(this.state.score + 1),
-            orbOffsetX: new Animated.Value(SCREEN_DIMENSIONS.width / 2 - 20 + (Math.random() * 80 - 40)),
-            orbOffsetY: new Animated.Value(SCREEN_DIMENSIONS.height / 2 - 20 + (Math.random() * 200 - 100))
+            orbOffsetX: new Animated.Value(SCREEN_DIMENSIONS.width / 2 - 20 + (Math.random() * 100 - 50)),
+            orbOffsetY: new Animated.Value(SCREEN_DIMENSIONS.height / 2 - 20 + (Math.random() * 250 - 125))
         }, () => {
             this._restartTimer(this.state.gameStep.time);
             this._fadeInOrb();
@@ -337,7 +342,9 @@ class Game extends Component {
     }
 
     _restartTimer = time => {
-        const now = Date.now();
+        const timerStart = Date.now();
+
+        // start step timer
         this.setState({ slidingTimerY: new Animated.Value(0) }, () => {
             Animated.timing(this.state.slidingTimerY, {
                 toValue: SCREEN_DIMENSIONS.height - 40,
@@ -346,8 +353,8 @@ class Game extends Component {
             }).start(() => {
 
                 // expire time if no swipe or late swipe
-                if (this.state.lastSwipe >= now + time + TIME_EXPIRED_W_BUFFER 
-                    || this.state.lastSwipe < now) {
+                if (this.state.lastSwipe >= timerStart + time + TIME_EXPIRED_W_BUFFER 
+                    || this.state.lastSwipe < timerStart) {
                     console.log('Time expired');
                     this._exitGame();
                 }

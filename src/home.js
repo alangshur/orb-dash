@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
     titleLogo: {
         position: 'absolute',
         resizeMode: 'contain',
-        top: '14%',
-        height: '19%'
+        top: '17%',
+        height: '18%'
     },
     highscoreText: {
         fontWeight: 'bold',
