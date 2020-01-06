@@ -23,12 +23,13 @@ const END_GAME_TIME = 300.0;
 const DIRECTION_STEPS = 15.0;
 const CARDINAL_STEPS = 15.0;
 const COLOR_STEPS = 15.0;
+const GROWTH_STEPS = 200.0;
 
 // animation constants
-const FLASH_TIME_MS = 75;
+const FLASH_TIME_MS = 115;
 const FADE_IN_ORB_TIME_MS = 600;
 const SLIDE_ORB_TIME_MS = 250;
-const INVERT_COLORS_MULTIPLE = 5.0;
+const INVERT_COLORS_MULTIPLE = 50.0;
 
 // timer constants
 const LAST_SWIPE_W_BUFFER = SLIDE_ORB_TIME_MS + 100;
@@ -124,9 +125,17 @@ class Game extends Component {
     }
 
     render = () => {
-        var invertColors = Boolean(Math.floor(this.state.score / INVERT_COLORS_MULTIPLE) % 2);
-        var scoreSize = null;
 
+        // color inversion reward
+        if (this.state.score < 10) var invertColors = false;
+        else if (this.state.score % INVERT_COLORS_MULTIPLE < 10) var invertColors = true;
+        else var invertColors = false;
+
+        // score growth reward
+        if (this.state.score > GROWTH_STEPS) var scoreSize = 100;
+        else var scoreSize = 30 + (70 / GROWTH_STEPS) * this.state.score;
+
+        // render game component
         return (
             <>
                 <View 
@@ -148,13 +157,14 @@ class Game extends Component {
                     <View 
                         style={{
                             ...styles.container,
-                            backgroundColor: invertColors ? '#111111' : '#dbdbdb'
+                            backgroundColor: invertColors ? '#333333' : '#dbdbdb'
                         }}
                     >
                         <Text 
                             style={{
                                 ...styles.scoreText,
-                                color: invertColors ? '#ffffff' : '#000000'
+                                color: invertColors ? '#ffffff' : '#000000',
+                                fontSize: scoreSize
                             }}
                         >
                             {this.state.score}
@@ -175,7 +185,7 @@ class Game extends Component {
                         <Animated.View 
                             style={{
                                 ...styles.slidingTimer,
-                                backgroundColor: invertColors ? '#333333' : '#bdbdbd'
+                                backgroundColor: invertColors ? '#555555' : '#bdbdbd'
                             }}
                             height={this.state.slidingTimerY}
                         />
@@ -462,8 +472,7 @@ const styles = StyleSheet.create({
     scoreText: {
         position: 'absolute',
         top: '8%',
-        fontWeight: 'bold',
-        fontSize: 70
+        fontWeight: 'bold'
     },
     slidingTimer: {
         position: 'absolute',
