@@ -3,6 +3,8 @@ import { View, StatusBar, Image, Text, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import AwesomeButton from "react-native-really-awesome-button";
 
+import gameOverLogo from './assets/game-over.png'
+
 class End extends Component {
     constructor(props) {
         super(props);
@@ -18,7 +20,7 @@ class End extends Component {
         return (
             <View style={styles.container}>
                 <Image
-                    source={require('./assets/game-over.png')}
+                    source={gameOverLogo}
                     style={styles.gameOverLogo}
                 />
 

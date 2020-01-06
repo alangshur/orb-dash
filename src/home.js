@@ -3,6 +3,8 @@ import { View, StatusBar, Image, Text, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import AwesomeButton from "react-native-really-awesome-button";
 
+import titleLogo from './assets/title-logo.png'
+
 class Home extends Component {
     constructor(props) {
         super(props);
@@ -17,7 +19,7 @@ class Home extends Component {
         return (
             <View style={styles.container}>
                 <Image
-                    source={require('./assets/title-logo.png')}
+                    source={titleLogo}
                     style={styles.titleLogo}
                 />
 
