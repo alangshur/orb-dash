@@ -24,12 +24,15 @@ const DIRECTION_STEPS = 15.0;
 const CARDINAL_STEPS = 15.0;
 const COLOR_STEPS = 15.0;
 
-// animation/timer constants
+// animation constants
 const FLASH_TIME_MS = 75;
 const FADE_IN_ORB_TIME_MS = 600;
 const SLIDE_ORB_TIME_MS = 250;
-const LAST_SWIPE_W_BUFFER = SLIDE_ORB_TIME_MS + 150;
-const TIME_EXPIRED_W_BUFFER = 75;
+const INVERT_COLORS_MULTIPLE = 5.0;
+
+// timer constants
+const LAST_SWIPE_W_BUFFER = SLIDE_ORB_TIME_MS + 100;
+const STEP_EXPIRATION_BUFFER = 50;
 
 // type constants
 const DIRECTION_MAP_ARR = new Array('up', 'right', 'down', 'left');
@@ -104,7 +107,8 @@ class Game extends Component {
         super(props);
         this.state = {
             score: 0,
-            lastSwipe: 0,
+            lastSwipe: Date.now(),
+            gameStepStart: Date.now(),
             gameStep: this._generateNextStep(0),
             orbOpacity: new Animated.Value(0),
             slidingTimerY: new Animated.Value(0),
@@ -120,6 +124,9 @@ class Game extends Component {
     }
 
     render = () => {
+        var invertColors = Boolean(Math.floor(this.state.score / INVERT_COLORS_MULTIPLE) % 2);
+        var scoreSize = null;
+
         return (
             <>
                 <View 
@@ -136,15 +143,19 @@ class Game extends Component {
                         velocityThreshold: 0.3, 
                         directionalOffsetThreshold: 60 
                     }}
-                    style={{
-                        flex: 1,
-                        backgroundColor: this.state.backgroundColor
-                    }}
+                    style={{ flex: 1 }}
                 >
-                    <View style={styles.container}>
+                    <View 
+                        style={{
+                            ...styles.container,
+                            backgroundColor: invertColors ? '#111111' : '#dbdbdb'
+                        }}
+                    >
                         <Text 
-                            style={styles.scoreText}
-                            color={'#ffffff'}
+                            style={{
+                                ...styles.scoreText,
+                                color: invertColors ? '#ffffff' : '#000000'
+                            }}
                         >
                             {this.state.score}
                         </Text>
@@ -162,7 +173,10 @@ class Game extends Component {
                         </Animated.View>
 
                         <Animated.View 
-                            style={styles.slidingTimer}
+                            style={{
+                                ...styles.slidingTimer,
+                                backgroundColor: invertColors ? '#333333' : '#bdbdbd'
+                            }}
                             height={this.state.slidingTimerY}
                         />
                     </View>
@@ -181,143 +195,155 @@ class Game extends Component {
     }
 
     _onSwipeUp = () => {
+        var now = Date.now();
         
-        // check for accidental swipe
-        if (Date.now() <= this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
-        else this.setState({ lastSwipe: Date.now() });
+        // check for accidental swipe and time expiration
+        if (now < this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
+        else if (now > this.state.gameStepStart + this.state.gameStep.time) return;
+        else this.setState({ lastSwipe: now }, () => {
+            
+            // handle valid swipe
+            if (this.state.gameStep.solution == 'up') {
+                console.log('Up: Correct.');
+                Animated.timing(         
+                    this.state.orbOffsetY,
+                    {
+                        toValue: -90,           
+                        duration: SLIDE_ORB_TIME_MS,       
+                    }
+                ).start(() => {
 
-        // handle valid swipe
-        if (this.state.gameStep.solution == 'up') {
-            console.log('Up: Correct.');
-            Animated.timing(         
-                this.state.orbOffsetY,
-                {
-                    toValue: -90,           
-                    duration: SLIDE_ORB_TIME_MS,       
-                }
-            ).start(() => {
+                    // flash screen every five
+                    if ((this.state.score + 1) % 5 == 0) {
+                        this.setState({ flashOpacity: 1 }, () => {
+                            setTimeout(() => { 
+                                this.setState({ flashOpacity: 0 });
+                            }, FLASH_TIME_MS);
+                        });
+                    }
 
-                // flash screen every five
-                if ((this.state.score + 1) % 5 == 0) {
-                    this.setState({ flashOpacity: 1 }, () => {
-                        setTimeout(() => { 
-                            this.setState({ flashOpacity: 0 });
-                        }, FLASH_TIME_MS);
-                    });
-                }
-
-                this._startNextGameStep();
-            });
-        }
-        else {
-            console.log('Up: Incorrect.');
-            this._exitGame();
-        }
+                    this._startNextGameStep();
+                });
+            }
+            else {
+                console.log('Up: Incorrect.');
+                this._exitGame();
+            }
+        });
     }
 
     _onSwipeRight = () => {
+        var now = Date.now();
+        
+        // check for accidental swipe and time expiration
+        if (now < this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
+        else if (now > this.state.gameStepStart + this.state.gameStep.time) return;
+        else this.setState({ lastSwipe: Date.now() }, () => {
 
-        // check for accidental swipe
-        if (Date.now() <= this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
-        else this.setState({ lastSwipe: Date.now() });
+            // handle valid swipe
+            if (this.state.gameStep.solution == 'right') {
+                console.log('Right: Correct.');
+                Animated.timing(         
+                    this.state.orbOffsetX,
+                    {
+                        toValue: SCREEN_DIMENSIONS.width + 90,           
+                        duration: SLIDE_ORB_TIME_MS,       
+                    }
+                ).start(() => {
+                    
+                    // flash screen every five
+                    if ((this.state.score + 1) % 5 == 0) {
+                        this.setState({ flashOpacity: 1 }, () => {
+                            setTimeout(() => { 
+                                this.setState({ flashOpacity: 0 });
+                            }, FLASH_TIME_MS);
+                        });
+                    }
 
-        // handle valid swipe
-        if (this.state.gameStep.solution == 'right') {
-            console.log('Right: Correct.');
-            Animated.timing(         
-                this.state.orbOffsetX,
-                {
-                    toValue: SCREEN_DIMENSIONS.width + 90,           
-                    duration: SLIDE_ORB_TIME_MS,       
-                }
-            ).start(() => {
-                
-                // flash screen every five
-                if ((this.state.score + 1) % 5 == 0) {
-                    this.setState({ flashOpacity: 1 }, () => {
-                        setTimeout(() => { 
-                            this.setState({ flashOpacity: 0 });
-                        }, FLASH_TIME_MS);
-                    });
-                }
-
-                this._startNextGameStep();
-            });
-        }
-        else {
-            console.log('Right: Incorrect.');
-            this._exitGame();
-        }
+                    this._startNextGameStep();
+                });
+            }
+            else {
+                console.log('Right: Incorrect.');
+                this._exitGame();
+            }
+        });
     }
      
     _onSwipeDown = () => {
+        var now = Date.now();
         
-        // check for accidental swipe
-        if (Date.now() <= this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
-        else this.setState({ lastSwipe: Date.now() });
+        // check for accidental swipe and time expiration
+        if (now < this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
+        else if (now > this.state.gameStepStart + this.state.gameStep.time) return;
+        else this.setState({ lastSwipe: Date.now() }, () => {
 
-        // handle valid swipe
-        if (this.state.gameStep.solution == 'down') {
-            console.log('Down: Correct.');
-            Animated.timing(         
-                this.state.orbOffsetY,
-                {
-                    toValue: SCREEN_DIMENSIONS.height + 90,           
-                    duration: SLIDE_ORB_TIME_MS,       
-                }
-            ).start(() => {
-                
-                // flash screen every five
-                if ((this.state.score + 1) % 5 == 0) {
-                    this.setState({ flashOpacity: 1 }, () => {
-                        setTimeout(() => { 
-                            this.setState({ flashOpacity: 0 });
-                        }, FLASH_TIME_MS);
-                    });
-                }
+            // handle valid swipe
+            if (this.state.gameStep.solution == 'down') {
+                console.log('Down: Correct.');
+                Animated.timing(         
+                    this.state.orbOffsetY,
+                    {
+                        toValue: SCREEN_DIMENSIONS.height + 90,           
+                        duration: SLIDE_ORB_TIME_MS,       
+                    }
+                ).start(() => {
+                    
+                    // flash screen every five
+                    if ((this.state.score + 1) % 5 == 0) {
+                        this.setState({ flashOpacity: 1 }, () => {
+                            setTimeout(() => { 
+                                this.setState({ flashOpacity: 0 });
+                            }, FLASH_TIME_MS);
+                        });
+                    }
 
-                this._startNextGameStep();
-            });
-        }
-        else {
-            console.log('Down: Incorrect.');
-            this._exitGame();
-        }
+                    this._startNextGameStep();
+                });
+            }
+            else {
+                console.log('Down: Incorrect.');
+                this._exitGame();
+            }
+        });
     }
     
     _onSwipeLeft = () => {
+        var now = Date.now();
         
-        // check for accidental swipe
-        if (Date.now() <= this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
-        else this.setState({ lastSwipe: Date.now() });
+        // check for accidental swipe and time expiration
+        if (now < this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
+        else if (now > this.state.gameStepStart + this.state.gameStep.time) return;
+        else this.setState({ lastSwipe: Date.now() }, () => {
 
-        // handle valid swipe
-        if (this.state.gameStep.solution == 'left') {
-            console.log('Left: Correct.');
-            Animated.timing(         
-                this.state.orbOffsetX,
-                {
-                    toValue: -90,           
-                    duration: SLIDE_ORB_TIME_MS,       
-                }
-            ).start(() => {
-                
-                // flash screen every five
-                if ((this.state.score + 1) % 5 == 0) {
-                    this.setState({ flashOpacity: 1 }, () => {
-                        setTimeout(() => { 
-                            this.setState({ flashOpacity: 0 });
-                        }, FLASH_TIME_MS);
-                    });
-                }
+            // handle valid swipe
+            if (this.state.gameStep.solution == 'left') {
+                console.log('Left: Correct.');
+                Animated.timing(         
+                    this.state.orbOffsetX,
+                    {
+                        toValue: -90,           
+                        duration: SLIDE_ORB_TIME_MS,       
+                    }
+                ).start(() => {
+                    
+                    // flash screen every five
+                    if ((this.state.score + 1) % 5 == 0) {
+                        this.setState({ flashOpacity: 1 }, () => {
+                            setTimeout(() => { 
+                                this.setState({ flashOpacity: 0 });
+                            }, FLASH_TIME_MS);
+                        });
+                    }
 
-                this._startNextGameStep();
-            });
-        }
-        else {
-            console.log('Left: Incorrect.');
-            this._exitGame();
-        }
+                    this._startNextGameStep();
+                });
+            }
+            else {
+                console.log('Left: Incorrect.');
+                this._exitGame();
+            }
+        });
     }
 
     _exitGame = () => {
@@ -336,28 +362,33 @@ class Game extends Component {
             orbOffsetX: new Animated.Value(SCREEN_DIMENSIONS.width / 2 - 20 + (Math.random() * 100 - 50)),
             orbOffsetY: new Animated.Value(SCREEN_DIMENSIONS.height / 2 - 20 + (Math.random() * 250 - 125))
         }, () => {
-            this._restartTimer(this.state.gameStep.time);
+            this._restartTimer();
             this._fadeInOrb();
         });
     }
 
-    _restartTimer = time => {
-        const timerStart = Date.now();
+    _restartTimer = () => {
+        var now = Date.now();
 
         // start step timer
-        this.setState({ slidingTimerY: new Animated.Value(0) }, () => {
-            Animated.timing(this.state.slidingTimerY, {
-                toValue: SCREEN_DIMENSIONS.height - 40,
-                duration: time,
-                easing: Easing.linear
-            }).start(() => {
+        this.setState({ gameStepStart: now }, () => {
+            this.setState({ slidingTimerY: new Animated.Value(0) }, () => {
+                Animated.timing(this.state.slidingTimerY, {
+                    toValue: SCREEN_DIMENSIONS.height - 40,
+                    duration: this.state.gameStep.time,
+                    easing: Easing.linear
+                }).start(() => {
 
-                // expire time if no swipe or late swipe
-                if (this.state.lastSwipe >= timerStart + time + TIME_EXPIRED_W_BUFFER 
-                    || this.state.lastSwipe < timerStart) {
-                    console.log('Time expired');
-                    this._exitGame();
-                }
+                    // expire time if missing swipe
+                    setTimeout(() => {
+                        if (this.state.lastSwipe < now) {
+                            console.log('Time expired');
+                            this.setState({ orbOpacity: 0 }, () => {
+                                this._exitGame();
+                            });
+                        }
+                    }, STEP_EXPIRATION_BUFFER);
+                });
             });
         });
     }
@@ -419,7 +450,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#dbdbdb',
         borderLeftWidth: 20,
         borderLeftColor: '#b80000',
         borderTopWidth: 20,
@@ -439,8 +469,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         zIndex: -1,
         width: '100%',
-        bottom: 0,
-        backgroundColor: '#bdbdbd'
+        bottom: 0
     },
     orbView: {
         position: 'absolute',
