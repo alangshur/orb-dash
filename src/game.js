@@ -15,14 +15,21 @@ import blueOrb from './assets/blue.png'
 import yellowOrb from './assets/yellow.png'
 import redOrb from './assets/red.png'
 
-// timing constants
-const DIRECTION_TIME = 3300.0;
-const CARDINAL_TIME = 2800.0;
+// game engine constants
+const DIRECTION_TIME = 2800.0;
+const CARDINAL_TIME = 2500.0;
 const COLOR_TIME = 2200.0;
 const END_GAME_TIME = 300.0;
-const DIRECTION_STEPS = 20.0;
-const CARDINAL_STEPS = 30.0;
-const COLOR_STEPS = 250.0;
+const DIRECTION_STEPS = 15.0;
+const CARDINAL_STEPS = 15.0;
+const COLOR_STEPS = 15.0;
+
+// animation/timer constants
+const FLASH_TIME_MS = 75;
+const FADE_IN_ORB_TIME_MS = 600;
+const SLIDE_ORB_TIME_MS = 250;
+const LAST_SWIPE_W_BUFFER = 250 + 200;
+const TIME_EXPIRED_W_BUFFER = 50;
 
 // type constants
 const DIRECTION_MAP_ARR = new Array('up', 'right', 'down', 'left');
@@ -39,16 +46,18 @@ const DIRECTION_MAP = new Map([
     ['left', 'left']
 ]);
 const CARDINAL_MAP = new Map([
-    ['up', 'up'],
-    ['right', 'right'],
-    ['down', 'down'],
-    ['left', 'left'],
     ['north', 'up'],
     ['east', 'right'],
     ['south', 'down'],
     ['west', 'left']
 ]);
 const COLOR_MAP = new Map([
+    ['green', 'up'],
+    ['blue', 'right'],
+    ['yellow', 'down'],
+    ['red', 'left']
+]);
+const COMBINED_MAP = new Map([
     ['up', 'up'],
     ['right', 'right'],
     ['down', 'down'],
@@ -95,12 +104,14 @@ class Game extends Component {
         super(props);
         this.state = {
             score: 0,
+            lastSwipe: 0,
             gameStep: this._generateNextStep(0),
             orbOpacity: new Animated.Value(0),
             slidingTimerY: new Animated.Value(0),
             slidingOrbY: new Animated.Value(0),
-            offsetX: '50%',
-            offsetY: '50%'
+            orbOffsetX: new Animated.Value(SCREEN_DIMENSIONS.width / 2 - 20),
+            orbOffsetY: new Animated.Value(SCREEN_DIMENSIONS.height / 2 - 20),
+            flashOpacity: 0
         }
     }
     
@@ -110,42 +121,48 @@ class Game extends Component {
 
     render = () => {
         return (
-            <GestureRecognizer
-                onSwipeUp={this._onSwipeUp}
-                onSwipeDown={this._onSwipeDown}
-                onSwipeLeft={this._onSwipeLeft}
-                onSwipeRight={this._onSwipeRight}
-                config={{
-                    velocityThreshold: 0.3, 
-                    directionalOffsetThreshold: 80 
-                }}
-                style={{
-                    flex: 1,
-                    backgroundColor: this.state.backgroundColor
-                }}
-            >
-                <View style={styles.container}>
-                    <Text style={styles.scoreText}>{this.state.score}</Text>
-                    
-                    <Animated.View 
-                        style={{ ...styles.orbView, opacity: this.state.orbOpacity }}
-                        left={this.state.offsetX}
-                        top={this.state.offsetY}
-                    >
-                        <Image
-                            source={IMAGE_MAP.get(this.state.gameStep.type)}
-                            style={styles.orbImage}
+            <>
+                <View 
+                    style={styles.flashScreen}
+                    opacity={this.state.flashOpacity}
+                    zIndex={this.state.flashOpacity}
+                />
+                <GestureRecognizer
+                    onSwipeUp={this._onSwipeUp}
+                    onSwipeDown={this._onSwipeDown}
+                    onSwipeLeft={this._onSwipeLeft}
+                    onSwipeRight={this._onSwipeRight}
+                    config={{
+                        velocityThreshold: 0.3, 
+                        directionalOffsetThreshold: 60 
+                    }}
+                    style={{
+                        flex: 1,
+                        backgroundColor: this.state.backgroundColor
+                    }}
+                >
+                    <View style={styles.container}>
+                        <Text style={styles.scoreText}>{this.state.score}</Text>
+                        
+                        <Animated.View 
+                            style={{ ...styles.orbView, opacity: this.state.orbOpacity }}
+                            left={this.state.orbOffsetX}
+                            top={this.state.orbOffsetY}
+                        >
+                            <Image
+                                source={IMAGE_MAP.get(this.state.gameStep.type)}
+                                style={styles.orbImage}
+                            />
+                            <Circle/>
+                        </Animated.View>
+
+                        <Animated.View 
+                            style={styles.slidingTimer}
+                            height={this.state.slidingTimerY}
                         />
-
-                        <Circle/>
-                    </Animated.View>
-
-                    <Animated.View 
-                        style={styles.slidingTimer}
-                        height={this.state.slidingTimerY}
-                    />
-                </View>
-            </GestureRecognizer>
+                    </View>
+                </GestureRecognizer>
+            </>
         );
     }
 
@@ -159,9 +176,33 @@ class Game extends Component {
     }
 
     _onSwipeUp = () => {
+        
+        // check for accidental swipe
+        if (Date.now() <= this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
+        else this.setState({ lastSwipe: Date.now() });
+
+        // handle valid swipe
         if (this.state.gameStep.solution == 'up') {
             console.log('Up: Correct.');
-            this._startNextGameStep();
+            Animated.timing(         
+                this.state.orbOffsetY,
+                {
+                    toValue: -90,           
+                    duration: SLIDE_ORB_TIME_MS,       
+                }
+            ).start(() => {
+
+                // flash screen every five
+                if ((this.state.score + 1) % 5 == 0) {
+                    this.setState({ flashOpacity: 1 }, () => {
+                        setTimeout(() => { 
+                            this.setState({ flashOpacity: 0 });
+                        }, FLASH_TIME_MS);
+                    });
+                }
+
+                this._startNextGameStep();
+            });
         }
         else {
             console.log('Up: Incorrect.');
@@ -170,9 +211,33 @@ class Game extends Component {
     }
 
     _onSwipeRight = () => {
+
+        // check for accidental swipe
+        if (Date.now() <= this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
+        else this.setState({ lastSwipe: Date.now() });
+
+        // handle valid swipe
         if (this.state.gameStep.solution == 'right') {
             console.log('Right: Correct.');
-            this._startNextGameStep();
+            Animated.timing(         
+                this.state.orbOffsetX,
+                {
+                    toValue: SCREEN_DIMENSIONS.width + 90,           
+                    duration: SLIDE_ORB_TIME_MS,       
+                }
+            ).start(() => {
+                
+                // flash screen every five
+                if ((this.state.score + 1) % 5 == 0) {
+                    this.setState({ flashOpacity: 1 }, () => {
+                        setTimeout(() => { 
+                            this.setState({ flashOpacity: 0 });
+                        }, FLASH_TIME_MS);
+                    });
+                }
+
+                this._startNextGameStep();
+            });
         }
         else {
             console.log('Right: Incorrect.');
@@ -181,9 +246,33 @@ class Game extends Component {
     }
      
     _onSwipeDown = () => {
+        
+        // check for accidental swipe
+        if (Date.now() <= this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
+        else this.setState({ lastSwipe: Date.now() });
+
+        // handle valid swipe
         if (this.state.gameStep.solution == 'down') {
             console.log('Down: Correct.');
-            this._startNextGameStep();
+            Animated.timing(         
+                this.state.orbOffsetY,
+                {
+                    toValue: SCREEN_DIMENSIONS.height + 90,           
+                    duration: SLIDE_ORB_TIME_MS,       
+                }
+            ).start(() => {
+                
+                // flash screen every five
+                if ((this.state.score + 1) % 5 == 0) {
+                    this.setState({ flashOpacity: 1 }, () => {
+                        setTimeout(() => { 
+                            this.setState({ flashOpacity: 0 });
+                        }, FLASH_TIME_MS);
+                    });
+                }
+
+                this._startNextGameStep();
+            });
         }
         else {
             console.log('Down: Incorrect.');
@@ -192,9 +281,33 @@ class Game extends Component {
     }
     
     _onSwipeLeft = () => {
+        
+        // check for accidental swipe
+        if (Date.now() <= this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
+        else this.setState({ lastSwipe: Date.now() });
+
+        // handle valid swipe
         if (this.state.gameStep.solution == 'left') {
             console.log('Left: Correct.');
-            this._startNextGameStep();
+            Animated.timing(         
+                this.state.orbOffsetX,
+                {
+                    toValue: -90,           
+                    duration: SLIDE_ORB_TIME_MS,       
+                }
+            ).start(() => {
+                
+                // flash screen every five
+                if ((this.state.score + 1) % 5 == 0) {
+                    this.setState({ flashOpacity: 1 }, () => {
+                        setTimeout(() => { 
+                            this.setState({ flashOpacity: 0 });
+                        }, FLASH_TIME_MS);
+                    });
+                }
+
+                this._startNextGameStep();
+            });
         }
         else {
             console.log('Left: Incorrect.');
@@ -209,11 +322,14 @@ class Game extends Component {
     }
 
     _startNextGameStep = () => {
+
+        // set next game step
         this.setState({
+            gameStepActive: false,
             score: this.state.score + 1,
             gameStep: this._generateNextStep(this.state.score + 1),
-            offsetX: String(35 + Math.round(Math.random() * 30)) + '%',
-            offsetY: String(35 + Math.round(Math.random() * 30)) + '%'
+            orbOffsetX: new Animated.Value(SCREEN_DIMENSIONS.width / 2 - 20 + (Math.random() * 80 - 40)),
+            orbOffsetY: new Animated.Value(SCREEN_DIMENSIONS.height / 2 - 20 + (Math.random() * 200 - 100))
         }, () => {
             this._restartTimer(this.state.gameStep.time);
             this._fadeInOrb();
@@ -228,7 +344,13 @@ class Game extends Component {
                 duration: time,
                 easing: Easing.linear
             }).start(() => {
-                if (Date.now() >= now + time) this._exitGame();
+
+                // expire time if no swipe or late swipe
+                if (this.state.lastSwipe >= now + time + TIME_EXPIRED_W_BUFFER 
+                    || this.state.lastSwipe < now) {
+                    console.log('Time expired');
+                    this._exitGame();
+                }
             });
         });
     }
@@ -239,20 +361,10 @@ class Game extends Component {
                 this.state.orbOpacity,
                 {
                     toValue: 1,           
-                    duration: 500,       
+                    duration: FADE_IN_ORB_TIME_MS,       
                 }
             ).start();
         });
-    }
-
-    _animateOrb = () => {
-        Animated.timing(         
-            this.state.orbOpacity,
-            {
-                toValue: 1,           
-                duration: 500,       
-            }
-        ).start();
     }
 
     _generateNextStep = score => {
@@ -283,6 +395,8 @@ class Game extends Component {
         // run end game
         else if (score >= (DIRECTION_STEPS + CARDINAL_STEPS + COLOR_STEPS)) {
             var time = END_GAME_TIME;
+            var type = COMBINED_MAP[COMBINED_MAP.length * Math.random() | 0];
+            var solution = COMBINED_MAP.get(type);
         }
 
         return {
@@ -310,9 +424,9 @@ const styles = StyleSheet.create({
     },
     scoreText: {
         position: 'absolute',
-        top: '9%',
+        top: '8%',
         fontWeight: 'bold',
-        fontSize: 65
+        fontSize: 70
     },
     slidingTimer: {
         position: 'absolute',
@@ -339,6 +453,12 @@ const styles = StyleSheet.create({
         height: 80, 
         borderRadius: 45,
         backgroundColor: '#dbdbdb' 
+    },
+    flashScreen: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#dbdbdb'
     }
 });
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { View, StatusBar, Image, Text, StyleSheet } from 'react-native';
+import { View, StatusBar,  Image, Text, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import AwesomeButton from "react-native-really-awesome-button";
+import AwesomeButton from 'react-native-really-awesome-button';
 
 import titleLogo from './assets/title-logo.png'
 
