@@ -16,9 +16,9 @@ import yellowOrb from './assets/yellow.png'
 import redOrb from './assets/red.png'
 
 // timing constants
-const DIRECTION_TIME = 4000.0;
-const CARDINAL_TIME = 3000.0;
-const COLOR_TIME = 2000.0;
+const DIRECTION_TIME = 3300.0;
+const CARDINAL_TIME = 2800.0;
+const COLOR_TIME = 2200.0;
 const END_GAME_TIME = 300.0;
 const DIRECTION_STEPS = 20.0;
 const CARDINAL_STEPS = 30.0;
@@ -86,8 +86,8 @@ class Circle extends Component {
     render = () => { 
         return ( 
             <View style={styles.circle}/> 
-        ) 
-    } 
+        );
+    }
 }
 
 class Game extends Component {
@@ -95,16 +95,17 @@ class Game extends Component {
         super(props);
         this.state = {
             score: 0,
-            gameRunning: true,
-            slidingTimerY: new Animated.Value(0),
             gameStep: this._generateNextStep(0),
             orbOpacity: new Animated.Value(0),
+            slidingTimerY: new Animated.Value(0),
+            slidingOrbY: new Animated.Value(0),
+            offsetX: '50%',
+            offsetY: '50%'
         }
     }
     
     componentDidMount = () => {
         this._runGamePage();
-        this._startNextGameStep();
     }
 
     render = () => {
@@ -115,8 +116,8 @@ class Game extends Component {
                 onSwipeLeft={this._onSwipeLeft}
                 onSwipeRight={this._onSwipeRight}
                 config={{
-                    velocityThreshold: 0.2, 
-                    directionalOffsetThreshold: 100 
+                    velocityThreshold: 0.3, 
+                    directionalOffsetThreshold: 80 
                 }}
                 style={{
                     flex: 1,
@@ -128,8 +129,8 @@ class Game extends Component {
                     
                     <Animated.View 
                         style={{ ...styles.orbView, opacity: this.state.orbOpacity }}
-                        left={this.state.gameStep.offsetX}
-                        top={this.state.gameStep.offsetY}
+                        left={this.state.offsetX}
+                        top={this.state.offsetY}
                     >
                         <Image
                             source={IMAGE_MAP.get(this.state.gameStep.type)}
@@ -151,38 +152,54 @@ class Game extends Component {
     _runGamePage = () => {
         console.log('Game page.');
         StatusBar.setHidden(true);
+
+        // initial game step
+        this._restartTimer(this.state.gameStep.time);
+        this._fadeInOrb();
     }
 
     _onSwipeUp = () => {
-        console.log('You swiped up!');
+        if (this.state.gameStep.solution == 'up') {
+            console.log('Up: Correct.');
+            this._startNextGameStep();
+        }
+        else {
+            console.log('Up: Incorrect.');
+            this._exitGame();
+        }
+    }
 
-        // CHECK IF CORRECT
-
-        this._restartTimer(1000);
+    _onSwipeRight = () => {
+        if (this.state.gameStep.solution == 'right') {
+            console.log('Right: Correct.');
+            this._startNextGameStep();
+        }
+        else {
+            console.log('Right: Incorrect.');
+            this._exitGame();
+        }
     }
      
     _onSwipeDown = () => {
-        console.log('You swiped down!');
-
-        // CHECK IF CORRECT
-
-        this._restartTimer(2000);
+        if (this.state.gameStep.solution == 'down') {
+            console.log('Down: Correct.');
+            this._startNextGameStep();
+        }
+        else {
+            console.log('Down: Incorrect.');
+            this._exitGame();
+        }
     }
     
     _onSwipeLeft = () => {
-        console.log('You swiped left!');
-
-        // CHECK IF CORRECT
-
-        this._restartTimer(3000);
-    }
-    
-    _onSwipeRight = () => {
-        console.log('You swiped right!');
-
-        // CHECK IF CORRECT
-
-        this._restartTimer(4000);
+        if (this.state.gameStep.solution == 'left') {
+            console.log('Left: Correct.');
+            this._startNextGameStep();
+        }
+        else {
+            console.log('Left: Incorrect.');
+            this._exitGame();
+        }
     }
 
     _exitGame = () => {
@@ -194,20 +211,25 @@ class Game extends Component {
     _startNextGameStep = () => {
         this.setState({
             score: this.state.score + 1,
-            gameStep: this._generateNextStep(this.state.score + 1)
+            gameStep: this._generateNextStep(this.state.score + 1),
+            offsetX: String(35 + Math.round(Math.random() * 30)) + '%',
+            offsetY: String(35 + Math.round(Math.random() * 30)) + '%'
         }, () => {
             this._restartTimer(this.state.gameStep.time);
-            this._fadeInOrb()
+            this._fadeInOrb();
         });
     }
 
     _restartTimer = time => {
+        const now = Date.now();
         this.setState({ slidingTimerY: new Animated.Value(0) }, () => {
             Animated.timing(this.state.slidingTimerY, {
                 toValue: SCREEN_DIMENSIONS.height - 40,
                 duration: time,
                 easing: Easing.linear
-            }).start();
+            }).start(() => {
+                if (Date.now() >= now + time) this._exitGame();
+            });
         });
     }
 
@@ -221,6 +243,16 @@ class Game extends Component {
                 }
             ).start();
         });
+    }
+
+    _animateOrb = () => {
+        Animated.timing(         
+            this.state.orbOpacity,
+            {
+                toValue: 1,           
+                duration: 500,       
+            }
+        ).start();
     }
 
     _generateNextStep = score => {
@@ -253,16 +285,10 @@ class Game extends Component {
             var time = END_GAME_TIME;
         }
 
-        // generate random offset
-        var offsetX = 35 + Math.round(Math.random() * 30)
-        var offsetY = 35 + Math.round(Math.random() * 30)
-
         return {
             time: Math.round(time),
             type: type,
-            solution: solution,
-            offsetX: String(offsetX) + '%',
-            offsetY: String(offsetY) + '%'
+            solution: solution
         };
     }
 }
@@ -286,7 +312,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: '9%',
         fontWeight: 'bold',
-        fontSize: 60
+        fontSize: 65
     },
     slidingTimer: {
         position: 'absolute',
