@@ -13,7 +13,10 @@ const StackNavigator = createStackNavigator(
     },
     {
         initialRouteName: 'Home',
-        headerMode: 'none'
+        headerMode: 'none',
+        navigationOptions: {
+            gesturesEnabled: false
+        }
     }
 );
 

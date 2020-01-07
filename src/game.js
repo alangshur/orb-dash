@@ -16,17 +16,17 @@ import yellowOrb from './assets/yellow.png'
 import redOrb from './assets/red.png'
 
 // game engine constants
-const DIRECTION_TIME = 2800.0;
-const CARDINAL_TIME = 2500.0;
-const COLOR_TIME = 2200.0;
-const END_GAME_TIME = 300.0;
-const DIRECTION_STEPS = 15.0;
-const CARDINAL_STEPS = 15.0;
-const COLOR_STEPS = 15.0;
+const DIRECTION_TIME = 2000.0;
+const CARDINAL_TIME = 1750.0;
+const COLOR_TIME = 1500.0;
+const END_GAME_TIME = 250.0;
+const DIRECTION_STEPS = 20.0;
+const CARDINAL_STEPS = 20.0;
+const COLOR_STEPS = 1000.0;
 const GROWTH_STEPS = 200.0;
 
 // animation constants
-const FLASH_TIME_MS = 115;
+const FLASH_TIME_MS = 150;
 const FADE_IN_ORB_TIME_MS = 600;
 const SLIDE_ORB_TIME_MS = 250;
 const INVERT_COLORS_MULTIPLE = 50.0;
@@ -37,10 +37,10 @@ const STEP_EXPIRATION_BUFFER = 50;
 
 // type constants
 const DIRECTION_MAP_ARR = new Array('up', 'right', 'down', 'left');
-const CARDINAL_MAP_ARR = new Array('up', 'right', 'down', 'left', 
-    'north', 'east', 'south', 'west');
-const COLOR_MAP_ARR = new Array('up', 'right', 'down', 'left', 'north', 
-    'east', 'south', 'west', 'green', 'blue', 'yellow', 'red');
+const CARDINAL_MAP_ARR = new Array('north', 'east', 'south', 'west', 
+    'up', 'right', 'down', 'left');
+const COLOR_MAP_ARR = new Array('north', 'east', 'south', 'west', 
+    'up', 'right', 'down', 'left', 'green', 'blue', 'yellow', 'red');
 
 // solution constants
 const DIRECTION_MAP = new Map([
@@ -50,18 +50,16 @@ const DIRECTION_MAP = new Map([
     ['left', 'left']
 ]);
 const CARDINAL_MAP = new Map([
+    ['up', 'up'],
+    ['right', 'right'],
+    ['down', 'down'],
+    ['left', 'left'],
     ['north', 'up'],
     ['east', 'right'],
     ['south', 'down'],
     ['west', 'left']
 ]);
 const COLOR_MAP = new Map([
-    ['green', 'up'],
-    ['blue', 'right'],
-    ['yellow', 'down'],
-    ['red', 'left']
-]);
-const COMBINED_MAP = new Map([
     ['up', 'up'],
     ['right', 'right'],
     ['down', 'down'],
@@ -149,7 +147,7 @@ class Game extends Component {
                     onSwipeLeft={this._onSwipeLeft}
                     onSwipeRight={this._onSwipeRight}
                     config={{
-                        velocityThreshold: 0.3, 
+                        velocityThreshold: 0.2, 
                         directionalOffsetThreshold: 60 
                     }}
                     style={{ flex: 1 }}
@@ -206,6 +204,11 @@ class Game extends Component {
 
     _onSwipeUp = () => {
         var now = Date.now();
+
+        console.log('up')
+        console.log(this.state.gameStep.time);
+        console.log(this.state.gameStep.type);
+        console.log(this.state.gameStep.solution);
         
         // check for accidental swipe and time expiration
         if (now < this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
@@ -244,6 +247,11 @@ class Game extends Component {
 
     _onSwipeRight = () => {
         var now = Date.now();
+
+        console.log('up')
+        console.log(this.state.gameStep.time);
+        console.log(this.state.gameStep.type);
+        console.log(this.state.gameStep.solution);
         
         // check for accidental swipe and time expiration
         if (now < this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
@@ -253,11 +261,11 @@ class Game extends Component {
             // handle valid swipe
             if (this.state.gameStep.solution == 'right') {
                 console.log('Right: Correct.');
-                Animated.timing(         
+                Animated.timing(
                     this.state.orbOffsetX,
                     {
                         toValue: SCREEN_DIMENSIONS.width + 90,           
-                        duration: SLIDE_ORB_TIME_MS,       
+                        duration: SLIDE_ORB_TIME_MS,
                     }
                 ).start(() => {
                     
@@ -282,6 +290,11 @@ class Game extends Component {
      
     _onSwipeDown = () => {
         var now = Date.now();
+
+        console.log('up')
+        console.log(this.state.gameStep.time);
+        console.log(this.state.gameStep.type);
+        console.log(this.state.gameStep.solution);
         
         // check for accidental swipe and time expiration
         if (now < this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
@@ -320,6 +333,11 @@ class Game extends Component {
     
     _onSwipeLeft = () => {
         var now = Date.now();
+
+        console.log('up')
+        console.log(this.state.gameStep.time);
+        console.log(this.state.gameStep.type);
+        console.log(this.state.gameStep.solution);
         
         // check for accidental swipe and time expiration
         if (now < this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
@@ -443,8 +461,8 @@ class Game extends Component {
         // run end game
         else if (score >= (DIRECTION_STEPS + CARDINAL_STEPS + COLOR_STEPS)) {
             var time = END_GAME_TIME;
-            var type = COMBINED_MAP[COMBINED_MAP.length * Math.random() | 0];
-            var solution = COMBINED_MAP.get(type);
+            var type = COLOR_MAP_ARR[COLOR_MAP_ARR.length * Math.random() | 0];
+            var solution = COLOR_MAP.get(type);
         }
 
         return {
