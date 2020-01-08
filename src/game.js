@@ -16,12 +16,12 @@ import yellowOrb from './assets/yellow.png'
 import redOrb from './assets/red.png'
 
 // game engine constants
-const DIRECTION_TIME = 1800.0;
-const CARDINAL_TIME = 1600.0;
+const DIRECTION_TIME = 2000.0;
+const CARDINAL_TIME = 1700.0;
 const COLOR_TIME = 1400.0;
-const END_GAME_TIME = 250.0;
-const DIRECTION_STEPS = 20.0;
-const CARDINAL_STEPS = 20.0;
+const END_GAME_TIME = 300.0;
+const DIRECTION_STEPS = 15.0;
+const CARDINAL_STEPS = 15.0;
 const COLOR_STEPS = 1000.0;
 const GROWTH_STEPS = 500.0;
 

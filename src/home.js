@@ -3,6 +3,7 @@ import { View, StatusBar,  Image, Text, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import AwesomeButton from 'react-native-really-awesome-button';
 
+import { AdMobBanner } from 'react-native-admob'
 import titleLogo from './assets/title-logo.png'
 
 class Home extends Component {
