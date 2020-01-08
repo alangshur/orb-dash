@@ -34,6 +34,20 @@ target 'swipe' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
+  target 'swipeTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
   use_native_modules!
+end
+
+target 'swipe-tvOS' do
+  # Pods for swipe-tvOS
+
+  target 'swipe-tvOSTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
 
 end

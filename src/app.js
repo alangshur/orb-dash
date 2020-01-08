@@ -14,7 +14,7 @@ const StackNavigator = createStackNavigator(
         Ad: Ad
     },
     {
-        initialRouteName: 'Ad',
+        initialRouteName: 'Home',
         headerMode: 'none',
         navigationOptions: {
             gesturesEnabled: false
