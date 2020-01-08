@@ -16,17 +16,17 @@ import yellowOrb from './assets/yellow.png'
 import redOrb from './assets/red.png'
 
 // game engine constants
-const DIRECTION_TIME = 2000.0;
-const CARDINAL_TIME = 1750.0;
-const COLOR_TIME = 1500.0;
+const DIRECTION_TIME = 1800.0;
+const CARDINAL_TIME = 1600.0;
+const COLOR_TIME = 1400.0;
 const END_GAME_TIME = 250.0;
 const DIRECTION_STEPS = 20.0;
 const CARDINAL_STEPS = 20.0;
 const COLOR_STEPS = 1000.0;
-const GROWTH_STEPS = 200.0;
+const GROWTH_STEPS = 500.0;
 
 // animation constants
-const FLASH_TIME_MS = 150;
+const FLASH_TIME_MS = 100;
 const FADE_IN_ORB_TIME_MS = 600;
 const SLIDE_ORB_TIME_MS = 250;
 const INVERT_COLORS_MULTIPLE = 50.0;
@@ -131,7 +131,7 @@ class Game extends Component {
 
         // score growth reward
         if (this.state.score > GROWTH_STEPS) var scoreSize = 100;
-        else var scoreSize = 30 + (70 / GROWTH_STEPS) * this.state.score;
+        else var scoreSize = 50 + (150 / GROWTH_STEPS) * this.state.score;
 
         // render game component
         return (
@@ -205,11 +205,6 @@ class Game extends Component {
     _onSwipeUp = () => {
         var now = Date.now();
 
-        console.log('up')
-        console.log(this.state.gameStep.time);
-        console.log(this.state.gameStep.type);
-        console.log(this.state.gameStep.solution);
-        
         // check for accidental swipe and time expiration
         if (now < this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
         else if (now > this.state.gameStepStart + this.state.gameStep.time) return;
@@ -248,11 +243,6 @@ class Game extends Component {
     _onSwipeRight = () => {
         var now = Date.now();
 
-        console.log('up')
-        console.log(this.state.gameStep.time);
-        console.log(this.state.gameStep.type);
-        console.log(this.state.gameStep.solution);
-        
         // check for accidental swipe and time expiration
         if (now < this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
         else if (now > this.state.gameStepStart + this.state.gameStep.time) return;
@@ -290,11 +280,6 @@ class Game extends Component {
      
     _onSwipeDown = () => {
         var now = Date.now();
-
-        console.log('up')
-        console.log(this.state.gameStep.time);
-        console.log(this.state.gameStep.type);
-        console.log(this.state.gameStep.solution);
         
         // check for accidental swipe and time expiration
         if (now < this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
@@ -334,11 +319,6 @@ class Game extends Component {
     _onSwipeLeft = () => {
         var now = Date.now();
 
-        console.log('up')
-        console.log(this.state.gameStep.time);
-        console.log(this.state.gameStep.type);
-        console.log(this.state.gameStep.solution);
-        
         // check for accidental swipe and time expiration
         if (now < this.state.lastSwipe + LAST_SWIPE_W_BUFFER) return;
         else if (now > this.state.gameStepStart + this.state.gameStep.time) return;
@@ -489,7 +469,7 @@ const styles = StyleSheet.create({
     },
     scoreText: {
         position: 'absolute',
-        top: '8%',
+        top: '13%',
         fontWeight: 'bold'
     },
     slidingTimer: {

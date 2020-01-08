@@ -4,15 +4,17 @@ import { createStackNavigator } from 'react-navigation-stack';
 import Home from './home';
 import Game from './game';
 import End from './end';
+import Ad from './ad';
 
 const StackNavigator = createStackNavigator(
     {
         Home: Home,
         Game: Game,
-        End: End
+        End: End,
+        Ad: Ad
     },
     {
-        initialRouteName: 'Home',
+        initialRouteName: 'Ad',
         headerMode: 'none',
         navigationOptions: {
             gesturesEnabled: false
